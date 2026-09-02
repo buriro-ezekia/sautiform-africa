@@ -117,7 +117,8 @@ python scripts/check_whisper_ready.py
 
 See `docs/BENCHMARK_COLLECTION_PROTOCOL.md` for the reference-first collection procedure, manifest
 freezing and the exact Whisper command. `docs/DEVELOPMENT_LOCK.md` records the locked development
-configuration and the boundary between development and held-out evaluation.
+configuration and the boundary between development and held-out evaluation. The fixed 24-clip final
+design is in `docs/HELDOUT_COLLECTION_PLAN.md`.
 
 ## Consent-aware benchmark manifest
 
@@ -173,5 +174,5 @@ See `docs/RESPONSIBLE_AI.md`, `docs/BENCHMARK_PROTOCOL.md` and
 Version `0.2.0` is the Phase 2 candidate. The 10-clip development pilot is locked and remains
 strictly development-only. Whisper is locked to `turbo`, forced Swahili (`sw`) and temperature zero,
 and the parser is frozen after its final bounded hardening pass. Real competition scores remain
-intentionally absent until a new consented held-out evaluation set is frozen and all four ASR systems
-are run on that identical manifest.
+intentionally absent until the fixed 24-clip consented held-out evaluation set is recorded, validated,
+frozen and run through all four ASR systems on the identical manifest.

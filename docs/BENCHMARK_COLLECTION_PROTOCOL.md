@@ -22,7 +22,7 @@ Use three stages rather than recording the full benchmark immediately:
 
 1. **Smoke test:** one clip to prove audio -> Whisper -> form -> metrics.
 2. **Pilot:** 8-12 clips to expose wording, device and extraction problems.
-3. **Frozen benchmark:** approximately 24-40 clips after the pilot design is stable.
+3. **Frozen benchmark:** exactly 24 held-out clips after the pilot design is locked.
 
 Keep clips short. For compatibility with the current Omnilingual ASR CTC path, target less than
 30 seconds per clip and do not exceed 40 seconds.
@@ -37,9 +37,9 @@ Samples `tz-sw-en-001` through `tz-sw-en-010` are development evidence. They pro
 audio-to-metrics path, exposed parser safety issues and were used to select Whisper model and
 inference configuration. They must therefore be excluded from the final frozen evaluation manifest.
 
-Create the final evaluation manifest only after parser and collection design are stable. Do not
-inspect model outputs from those held-out clips until the software and model configurations are
-frozen.
+Create the final evaluation manifest only after parser and collection design are stable. The fixed
+24-row design is specified in `docs/HELDOUT_COLLECTION_PLAN.md`. Do not inspect model outputs from
+those held-out clips until all 24 rows have been validated and the manifest has been frozen.
 
 ## Reference-first rule
 
@@ -131,8 +131,9 @@ Retain the JSON output; do not copy predicted transcripts back into benchmark re
 ## Freeze before four-model comparison
 
 Do not freeze the 10-row development manifest as the competition benchmark. After parser and model
-configuration are locked, create a new held-out manifest containing unseen consented audio. Check it
-manually, then freeze that held-out manifest:
+configuration are locked, record the fixed 24-row held-out design under `data/private/heldout`. Run
+`scripts/validate_heldout_manifest.py` and the general manifest validator, then freeze that held-out
+manifest:
 
 ```powershell
 python scripts/freeze_benchmark_manifest.py `
