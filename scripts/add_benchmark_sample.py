@@ -1,4 +1,4 @@
-"""Add one consented audio clip to the ignored local benchmark workspace."""
+"""Add one consented audio clip to a private benchmark workspace."""
 from __future__ import annotations
 
 import argparse
@@ -23,6 +23,15 @@ def main() -> None:
     parser.add_argument("--country", default="Tanzania")
     parser.add_argument("--language-pair", default="sw-en")
     parser.add_argument(
+        "--root",
+        type=Path,
+        default=Path("data/private"),
+        help=(
+            "Private workspace root. Use a separate root such as "
+            "data/private/heldout for final evaluation audio."
+        ),
+    )
+    parser.add_argument(
         "--consented",
         action="store_true",
         help="Confirm that the speaker gave informed consent for this benchmark use.",
@@ -45,6 +54,7 @@ def main() -> None:
         consented=args.consented,
         country=args.country,
         language_pair=args.language_pair,
+        root=args.root,
     )
     print("BENCHMARK_SAMPLE_ADDED=YES")
     print(json.dumps(row, ensure_ascii=False, indent=2))

@@ -115,8 +115,9 @@ python scripts/add_benchmark_sample.py --help
 python scripts/check_whisper_ready.py
 ```
 
-See `docs/BENCHMARK_COLLECTION_PROTOCOL.md` for the reference-first collection procedure, the first
-smoke-test utterance, manifest freezing and the exact Whisper command.
+See `docs/BENCHMARK_COLLECTION_PROTOCOL.md` for the reference-first collection procedure, manifest
+freezing and the exact Whisper command. `docs/DEVELOPMENT_LOCK.md` records the locked development
+configuration and the boundary between development and held-out evaluation.
 
 ## Consent-aware benchmark manifest
 
@@ -169,7 +170,8 @@ See `docs/RESPONSIBLE_AI.md`, `docs/BENCHMARK_PROTOCOL.md` and
 
 ## Repository status
 
-Version `0.2.0` is the Phase 2 candidate. It adds the named four-model benchmark architecture,
-consent-aware manifest validation, audio safeguards, an interactive voice/form interface and local
-benchmark orchestration. Real benchmark scores remain intentionally absent until Sahara credentials
-and a consented evaluation audio set are available.
+Version `0.2.0` is the Phase 2 candidate. The 10-clip development pilot is locked and remains
+strictly development-only. Whisper is locked to `turbo`, forced Swahili (`sw`) and temperature zero,
+and the parser is frozen after its final bounded hardening pass. Real competition scores remain
+intentionally absent until a new consented held-out evaluation set is frozen and all four ASR systems
+are run on that identical manifest.
