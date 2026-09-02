@@ -58,13 +58,27 @@ condition. Do not conceal failed samples or failed model runs from the reported 
 
 ## Whisper pilot configuration
 
-Whisper is initially evaluated with its library defaults: automatic language detection and the
-library's fallback temperature schedule. During pilot development only, `WHISPER_LANGUAGE` and
-`WHISPER_TEMPERATURE` may be set explicitly to compare configurations. The benchmark output records
-the requested language, resulting language, model, device and requested temperature for every item.
+Four Whisper configurations were compared on the first four development clips. The selected
+configuration is:
 
-Any final Whisper configuration must be selected using development/pilot audio, documented, then
-frozen before held-out evaluation. Do not tune Whisper configuration on final benchmark clips.
+```text
+model=small
+language=sw
+temperature=0
+```
+
+The decision rule prioritised downstream field exact match, then complete-form accuracy, then WER,
+CER and latency. `sw` with temperature zero matched the best downstream score among the
+forced-Swahili configurations, retained the lower WER/CER observed with forced Swahili, and removed
+the library's fallback-temperature variability.
+
+These four clips remain development data and must not be included in the held-out competition
+benchmark. The selected configuration is used unchanged for the remainder of pilot collection. Any
+later change must be justified using development data only and documented before the held-out
+manifest is created.
+
+The benchmark output records the requested language, resulting language, model, device and requested
+temperature for every item.
 
 ## Reproducibility
 

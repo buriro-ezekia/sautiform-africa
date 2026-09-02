@@ -33,9 +33,9 @@ A clip becomes **development/pilot data** as soon as its transcript, prediction 
 are used to change extraction logic, prompts, normalisation rules or model configuration. Such a clip
 must not be counted in the final held-out competition benchmark.
 
-The first smoke-test clip `tz-sw-en-001` is therefore development evidence. It proves the real
-audio-to-metrics path and may be used for debugging, but it must be excluded from the final frozen
-evaluation manifest after any code is tuned in response to its output.
+Samples `tz-sw-en-001` through `tz-sw-en-004` are development evidence. They proved the real
+audio-to-metrics path, exposed parser safety issues and were used to select Whisper configuration.
+They must therefore be excluded from the final frozen evaluation manifest.
 
 Create the final evaluation manifest only after parser and collection design are stable. Do not
 inspect model outputs from those held-out clips until the software and model configurations are
@@ -124,12 +124,6 @@ python scripts/validate_manifest.py `
   --manifest data/private/benchmark_manifest.jsonl
 ```
 
-Expected:
-
-```text
-BENCHMARK_MANIFEST_VALID=YES rows=1
-```
-
 ## Whisper readiness
 
 Install Whisper only after the software tests are green:
@@ -142,47 +136,38 @@ python scripts/check_whisper_ready.py
 The readiness check verifies both the Python package and the FFmpeg executable. It does not download
 a Whisper model.
 
-The selected model is controlled by `WHISPER_MODEL`. The repository default is `small`. Keep the
-model name fixed once the final benchmark is frozen.
+## Selected Whisper pilot configuration
 
-## First real Whisper run
+The first four development clips were compared under automatic versus forced-Swahili language
+handling and default fallback versus temperature-zero decoding. The selected configuration is:
 
 ```powershell
 $env:WHISPER_MODEL = "small"
-
-python scripts/run_benchmark.py `
-  --manifest data/private/benchmark_manifest.jsonl `
-  --backend whisper `
-  --output benchmark_results_whisper.json
-```
-
-The first run may download the selected Whisper model. Retain the JSON output; do not copy its
-predicted transcript back into the benchmark reference.
-
-## Pilot ASR diagnosis
-
-The first four clips are development data. After the baseline Whisper run, inspect the
-`asr_metadata` field for each item. If automatic language detection is inconsistent, a controlled
-pilot comparison may force Swahili with:
-
-```powershell
-$env:WHISPER_LANGUAGE = "sw"
-Remove-Item Env:WHISPER_TEMPERATURE -ErrorAction SilentlyContinue
-```
-
-A separate deterministic decoding comparison may use:
-
-```powershell
 $env:WHISPER_LANGUAGE = "sw"
 $env:WHISPER_TEMPERATURE = "0"
 ```
 
-Do not combine results from different configurations. Select one configuration from pilot evidence,
-then keep it fixed for the held-out evaluation.
+Use these settings unchanged for the remainder of the pilot. Do not mix outputs from different
+Whisper configurations in one summary.
+
+The selected configuration is provisional only in the sense that the final held-out benchmark has
+not yet been created. Any further configuration change must be justified on development clips and
+recorded before held-out collection begins.
+
+## Run the current pilot
+
+```powershell
+python scripts/run_benchmark.py `
+  --manifest data/private/benchmark_manifest.jsonl `
+  --backend whisper `
+  --output benchmark_results_whisper_pilot.json
+```
+
+Retain the JSON output; do not copy predicted transcripts back into benchmark references.
 
 ## Freeze before four-model comparison
 
-After the pilot is complete and the final manifest has been checked manually:
+After the pilot is complete and the final held-out manifest has been checked manually:
 
 ```powershell
 python scripts/freeze_benchmark_manifest.py `
