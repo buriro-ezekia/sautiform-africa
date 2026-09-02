@@ -1,4 +1,4 @@
-"""Deterministic extraction for the first Kiswahili-English public-service prototype."""
+"""Deterministic extraction for the Kiswahili-English public-service prototype."""
 from __future__ import annotations
 
 import re
@@ -35,18 +35,28 @@ _DISTRICT_PATTERNS = [
         r"\s+([A-Za-z-]+)(?:\s+District)?",
         re.I,
     ),
+    re.compile(
+        r"(?:ninaishi\w*|naishi\w*)\s+([A-Za-z-]+)\s+district\b",
+        re.I,
+    ),
 ]
 _OCCUPATION_PATTERNS = [
     re.compile(
         r"(?:occupation(?: yangu)?(?: ni)?|kazi yangu ni|I work as(?: a)?)"
-        r"\s+([A-Za-z -]+?)(?=,|\.|\band\b|\bna\b|$)",
+        r"\s+([A-Za-z -]+?)(?=,|\.|\band\b|\bna\b|\bhousehold\b|$)",
+        re.I,
+    ),
+    re.compile(
+        r"\b[A-Za-z]{5,16}\s+(?:yangu|angu)\s+ni\s+"
+        r"([A-Za-z-]+)(?=\s+household\b|,|\.|$)",
         re.I,
     ),
 ]
 _HOUSEHOLD_PATTERNS = [
     re.compile(
-        r"(?:household(?: yangu)?(?: ina| has)?|familia(?: yangu)?(?: ina)?)"
-        r"(?:\s+watu)?\s+(\d+|[A-Za-z]+)",
+        r"(?:household(?:i)?(?: yangu)?\s*(?:ina|has)?\s*"
+        r"(?:watu)?|familia(?: yangu)?(?: ina)?)"
+        r"\s+(\d+|[A-Za-z]+)",
         re.I,
     ),
     re.compile(r"(\d+|[A-Za-z]+)\s+(?:people|members|watu)\b", re.I),
@@ -64,6 +74,13 @@ def _normalise_words(value: str) -> str:
     return " ".join(value.strip().split())
 
 
+def _normalise_asr_spacing(text: str) -> str:
+    """Repair conservative token-boundary errors without changing content words."""
+    text = re.sub(r"\bhouseholdi\b", "household", text, flags=re.I)
+    text = re.sub(r"\binawatu\b", "ina watu", text, flags=re.I)
+    return _normalise_words(text)
+
+
 def _parse_count(token: str) -> int | None:
     token = token.lower().strip()
     if token.isdigit():
@@ -72,9 +89,10 @@ def _parse_count(token: str) -> int | None:
 
 
 def extract_form(text: str, existing: PublicServiceForm | None = None) -> PublicServiceForm:
-    """Extract only explicit values; ambiguous or absent values remain unset."""
+    """Extract explicit values while tolerating limited ASR boundary variation."""
     form = existing or PublicServiceForm()
     updates: dict[str, object] = {}
+    text = _normalise_asr_spacing(text)
 
     for pattern in _DISTRICT_PATTERNS:
         match = pattern.search(text)

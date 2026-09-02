@@ -27,6 +27,20 @@ Use three stages rather than recording the full benchmark immediately:
 Keep clips short. For compatibility with the current Omnilingual ASR CTC path, target less than
 30 seconds per clip and do not exceed 40 seconds.
 
+## Development versus held-out evaluation
+
+A clip becomes **development/pilot data** as soon as its transcript, prediction or downstream errors
+are used to change extraction logic, prompts, normalisation rules or model configuration. Such a clip
+must not be counted in the final held-out competition benchmark.
+
+The first smoke-test clip `tz-sw-en-001` is therefore development evidence. It proves the real
+audio-to-metrics path and may be used for debugging, but it must be excluded from the final frozen
+evaluation manifest after any code is tuned in response to its output.
+
+Create the final evaluation manifest only after parser and collection design are stable. Do not
+inspect model outputs from those held-out clips until the software and model configurations are
+frozen.
+
 ## Reference-first rule
 
 For every sample:
