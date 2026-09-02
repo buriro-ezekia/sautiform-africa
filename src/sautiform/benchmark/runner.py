@@ -31,6 +31,7 @@ def run_rows(
                 "audio_path": item["audio_path"],
                 "metadata": item["metadata"],
                 "backend": result.backend,
+                "asr_metadata": result.metadata or {},
                 "transcript": result.text,
                 "predicted_fields": predicted_form.to_dict(),
                 "wer": word_error_rate(

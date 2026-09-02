@@ -30,3 +30,10 @@ def test_recovers_structure_but_not_content_from_observed_asr_variation():
     assert form.occupation == "farmer"
     assert form.household_size == 6
     assert form.service_request == "basic certificate"
+
+
+def test_bare_district_word_does_not_invent_location():
+    form = extract_form(
+        "I live when I can't own a district because I am a driver."
+    )
+    assert form.district is None

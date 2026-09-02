@@ -56,6 +56,16 @@ application task.
 Where sample size permits, stratify results by language mix, accent or country, device and noise
 condition. Do not conceal failed samples or failed model runs from the reported denominator.
 
+## Whisper pilot configuration
+
+Whisper is initially evaluated with its library defaults: automatic language detection and the
+library's fallback temperature schedule. During pilot development only, `WHISPER_LANGUAGE` and
+`WHISPER_TEMPERATURE` may be set explicitly to compare configurations. The benchmark output records
+the requested language, resulting language, model, device and requested temperature for every item.
+
+Any final Whisper configuration must be selected using development/pilot audio, documented, then
+frozen before held-out evaluation. Do not tune Whisper configuration on final benchmark clips.
+
 ## Reproducibility
 
 Freeze the benchmark manifest before the final comparison. Record model identifiers, package

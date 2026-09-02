@@ -159,6 +159,27 @@ python scripts/run_benchmark.py `
 The first run may download the selected Whisper model. Retain the JSON output; do not copy its
 predicted transcript back into the benchmark reference.
 
+## Pilot ASR diagnosis
+
+The first four clips are development data. After the baseline Whisper run, inspect the
+`asr_metadata` field for each item. If automatic language detection is inconsistent, a controlled
+pilot comparison may force Swahili with:
+
+```powershell
+$env:WHISPER_LANGUAGE = "sw"
+Remove-Item Env:WHISPER_TEMPERATURE -ErrorAction SilentlyContinue
+```
+
+A separate deterministic decoding comparison may use:
+
+```powershell
+$env:WHISPER_LANGUAGE = "sw"
+$env:WHISPER_TEMPERATURE = "0"
+```
+
+Do not combine results from different configurations. Select one configuration from pilot evidence,
+then keep it fixed for the held-out evaluation.
+
 ## Freeze before four-model comparison
 
 After the pilot is complete and the final manifest has been checked manually:

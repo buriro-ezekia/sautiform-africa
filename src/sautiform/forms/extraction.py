@@ -31,8 +31,12 @@ _NUMBER_WORDS = {
 
 _DISTRICT_PATTERNS = [
     re.compile(
-        r"(?:ninaishi|naishi|I live in|district(?: yangu)?(?: ni)?)"
+        r"(?:ninaishi|naishi|I live in)"
         r"\s+([A-Za-z-]+)(?:\s+District)?",
+        re.I,
+    ),
+    re.compile(
+        r"district(?: yangu)?\s+ni\s+([A-Za-z-]+)",
         re.I,
     ),
     re.compile(
