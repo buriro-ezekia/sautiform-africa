@@ -56,29 +56,40 @@ application task.
 Where sample size permits, stratify results by language mix, accent or country, device and noise
 condition. Do not conceal failed samples or failed model runs from the reported denominator.
 
-## Whisper pilot configuration
+## Selected Whisper configuration
 
-Four Whisper configurations were compared on the first four development clips. The selected
-configuration is:
+Whisper configuration was selected entirely on development audio before creation of the held-out
+benchmark. The 10-clip pilot first established that forced Swahili with temperature zero was more
+reproducible than automatic language detection for the local CPU environment. The same 10 clips then
+compared the `small` and `turbo` multilingual models and finally compared Turbo under forced
+Swahili against automatic language detection.
+
+The selected configuration is:
 
 ```text
-model=small
+model=turbo
 language=sw
 temperature=0
 ```
 
-The decision rule prioritised downstream field exact match, then complete-form accuracy, then WER,
-CER and latency. `sw` with temperature zero matched the best downstream score among the
-forced-Swahili configurations, retained the lower WER/CER observed with forced Swahili, and removed
-the library's fallback-temperature variability.
+On the 10 development clips, Turbo with forced Swahili materially reduced WER and CER and doubled
+field exact-match accuracy relative to the earlier Small configuration, although it increased CPU
+latency. Turbo with automatic language detection was both slower and less accurate on the same
+development set.
 
-These four clips remain development data and must not be included in the held-out competition
-benchmark. The selected configuration is used unchanged for the remainder of pilot collection. Any
-later change must be justified using development data only and documented before the held-out
-manifest is created.
+Samples `tz-sw-en-001` through `tz-sw-en-010` are therefore development-only evidence. They must
+not appear in the final competition benchmark or be used to claim held-out performance.
 
 The benchmark output records the requested language, resulting language, model, device and requested
 temperature for every item.
+
+## Parser development boundary
+
+Parser changes may use the development clips, but only bounded structural normalisation is allowed.
+Examples include token-boundary repair, harmless articles and UK/US spelling equivalence. Content
+errors such as a misrecognised district or service name must not be silently replaced with the
+reference answer. Uncertain fields remain missing and are handled by clarification and explicit human
+confirmation.
 
 ## Reproducibility
 

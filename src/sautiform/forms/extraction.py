@@ -9,9 +9,13 @@ from sautiform.forms.public_service import PublicServiceForm
 _NUMBER_WORDS = {
     "moja": 1,
     "mbili": 2,
+    "wawili": 2,
     "tatu": 3,
+    "watatu": 3,
     "nne": 4,
+    "wanne": 4,
     "tano": 5,
+    "watano": 5,
     "sita": 6,
     "saba": 7,
     "nane": 8,
@@ -31,7 +35,7 @@ _NUMBER_WORDS = {
 
 _DISTRICT_PATTERNS = [
     re.compile(
-        r"(?:ninaishi|naishi|I live in)"
+        r"(?:ninaishi|naishi|inaishi|naishu|I live in(?: the)?)"
         r"\s+([A-Za-z-]+)(?:\s+District)?",
         re.I,
     ),
@@ -47,12 +51,17 @@ _DISTRICT_PATTERNS = [
 _OCCUPATION_PATTERNS = [
     re.compile(
         r"(?:occupation(?: yangu)?(?: ni)?|kazi yangu ni|I work as(?: a)?)"
-        r"\s+([A-Za-z -]+?)(?=,|\.|\band\b|\bna\b|\bhousehold\b|$)",
+        r"\s+([A-Za-z -]+?)"
+        r"(?=,|\.|\band\b|\bna\b|\bhousehold\b|\bfamilia\b|"
+        r"\bnataka\b|\bnahitaji\b|\bI need\b|\bservice\b|"
+        r"\b[A-Za-z]{3,16}\s+yangu\s+ina\b|$)",
         re.I,
     ),
     re.compile(
         r"\b[A-Za-z]{5,16}\s+(?:yangu|angu)\s+ni\s+"
-        r"([A-Za-z-]+)(?=\s+household\b|,|\.|$)",
+        r"([A-Za-z-]+)"
+        r"(?=\s+household\b|\s+familia\b|\s+nataka\b|"
+        r"\s+nahitaji\b|,|\.|$)",
         re.I,
     ),
 ]
@@ -82,7 +91,17 @@ def _normalise_asr_spacing(text: str) -> str:
     """Repair conservative token-boundary errors without changing content words."""
     text = re.sub(r"\bhouseholdi\b", "household", text, flags=re.I)
     text = re.sub(r"\binawatu\b", "ina watu", text, flags=re.I)
+    text = re.sub(r"\bna\s+itaji\b", "nahitaji", text, flags=re.I)
+    text = re.sub(r"\bnaitaji\b", "nahitaji", text, flags=re.I)
+    text = re.sub(r"\bwa\s+wili\b", "wawili", text, flags=re.I)
     return _normalise_words(text)
+
+
+def _normalise_service(value: str) -> str:
+    """Canonicalise harmless articles and UK/US licence spelling only."""
+    value = _normalise_words(value).lower()
+    value = re.sub(r"^(?:a|the)\s+", "", value)
+    return re.sub(r"\blicense\b", "licence", value)
 
 
 def _parse_count(token: str) -> int | None:
@@ -121,7 +140,7 @@ def extract_form(text: str, existing: PublicServiceForm | None = None) -> Public
     for pattern in _SERVICE_PATTERNS:
         match = pattern.search(text)
         if match:
-            updates["service_request"] = _normalise_words(match.group(1)).lower()
+            updates["service_request"] = _normalise_service(match.group(1))
             break
 
     return replace(form, **updates)

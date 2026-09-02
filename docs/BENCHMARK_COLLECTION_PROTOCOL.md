@@ -33,9 +33,9 @@ A clip becomes **development/pilot data** as soon as its transcript, prediction 
 are used to change extraction logic, prompts, normalisation rules or model configuration. Such a clip
 must not be counted in the final held-out competition benchmark.
 
-Samples `tz-sw-en-001` through `tz-sw-en-004` are development evidence. They proved the real
-audio-to-metrics path, exposed parser safety issues and were used to select Whisper configuration.
-They must therefore be excluded from the final frozen evaluation manifest.
+Samples `tz-sw-en-001` through `tz-sw-en-010` are development evidence. They proved the real
+audio-to-metrics path, exposed parser safety issues and were used to select Whisper model and
+inference configuration. They must therefore be excluded from the final frozen evaluation manifest.
 
 Create the final evaluation manifest only after parser and collection design are stable. Do not
 inspect model outputs from those held-out clips until the software and model configurations are
@@ -68,62 +68,6 @@ The final set should vary naturally across:
 Do not manufacture noise that makes the utterance unintelligible. The benchmark should represent
 realistic use rather than an adversarial stress test.
 
-## First smoke-test utterance
-
-Use a non-sensitive, fictional record:
-
-```text
-Ninaishi Mbozi District, occupation yangu ni farmer, household ina watu sita,
-nataka birth certificate.
-```
-
-Reference fields:
-
-```text
-district=Mbozi
-occupation=farmer
-household_size=6
-service_request=birth certificate
-```
-
-## Add the first clip
-
-Save the recording anywhere outside the repository first, for example:
-
-```text
-C:\recordings\tz-sw-en-001.wav
-```
-
-Then add it to the ignored private workspace:
-
-```powershell
-$clip = "C:\recordings\tz-sw-en-001.wav"
-$reference = "Ninaishi Mbozi District, occupation yangu ni farmer, " + `
-  "household ina watu sita, nataka birth certificate."
-
-python scripts/add_benchmark_sample.py `
-  --audio $clip `
-  --sample-id tz-sw-en-001 `
-  --transcript $reference `
-  --district Mbozi `
-  --occupation farmer `
-  --household-size 6 `
-  --service-request "birth certificate" `
-  --device "laptop microphone" `
-  --noise "quiet room" `
-  --consented
-```
-
-The script copies the clip to `data/private/audio/` and appends one validated JSONL row to
-`data/private/benchmark_manifest.jsonl`.
-
-## Validate before inference
-
-```powershell
-python scripts/validate_manifest.py `
-  --manifest data/private/benchmark_manifest.jsonl
-```
-
 ## Whisper readiness
 
 Install Whisper only after the software tests are green:
@@ -136,43 +80,64 @@ python scripts/check_whisper_ready.py
 The readiness check verifies both the Python package and the FFmpeg executable. It does not download
 a Whisper model.
 
-## Selected Whisper pilot configuration
+## Selected Whisper development configuration
 
-The first four development clips were compared under automatic versus forced-Swahili language
-handling and default fallback versus temperature-zero decoding. The selected configuration is:
+The 10-clip pilot selected Turbo with forced Swahili and deterministic temperature-zero decoding:
 
 ```powershell
-$env:WHISPER_MODEL = "small"
+$env:WHISPER_MODEL = "turbo"
 $env:WHISPER_LANGUAGE = "sw"
 $env:WHISPER_TEMPERATURE = "0"
 ```
 
-Use these settings unchanged for the remainder of the pilot. Do not mix outputs from different
-Whisper configurations in one summary.
+Use these settings unchanged after the final parser regression gate. Do not mix outputs from
+different Whisper configurations in one summary.
 
-The selected configuration is provisional only in the sense that the final held-out benchmark has
-not yet been created. Any further configuration change must be justified on development clips and
-recorded before held-out collection begins.
+The development comparison showed that Turbo was substantially more accurate than Small on the same
+10 clips, while Turbo automatic language detection was slower and less accurate than forced Swahili.
+Those development scores are diagnostic only and must not be presented as held-out competition
+performance.
 
-## Run the current pilot
+## Parser hardening boundary
+
+Development clips may be used to strengthen deterministic extraction only where the transformation
+does not invent content. Permitted examples include:
+
+- repairing split structural tokens such as `na itaji` -> `nahitaji`;
+- recognising ordinary Swahili number agreement such as `wawili`;
+- stripping a harmless leading article from a service phrase;
+- canonicalising `license` to UK English `licence`;
+- preventing one field extractor from swallowing a following clause.
+
+Do not map misrecognised values such as a wrong district or wrong certificate name back to the
+reference answer. Such values must remain wrong or missing so the clarification and confirmation
+workflow can handle them safely.
+
+## Run the development regression
 
 ```powershell
+$env:WHISPER_MODEL = "turbo"
+$env:WHISPER_LANGUAGE = "sw"
+$env:WHISPER_TEMPERATURE = "0"
+
 python scripts/run_benchmark.py `
   --manifest data/private/benchmark_manifest.jsonl `
   --backend whisper `
-  --output benchmark_results_whisper_pilot.json
+  --output benchmark_results_whisper_turbo_parser_regression.json
 ```
 
 Retain the JSON output; do not copy predicted transcripts back into benchmark references.
 
 ## Freeze before four-model comparison
 
-After the pilot is complete and the final held-out manifest has been checked manually:
+Do not freeze the 10-row development manifest as the competition benchmark. After parser and model
+configuration are locked, create a new held-out manifest containing unseen consented audio. Check it
+manually, then freeze that held-out manifest:
 
 ```powershell
 python scripts/freeze_benchmark_manifest.py `
-  --manifest data/private/benchmark_manifest.jsonl
+  --manifest data/private/<held-out-manifest>.jsonl
 ```
 
 Record the printed SHA-256 value in the final evaluation notes. All four ASR systems must then use
-that exact frozen manifest.
+that exact frozen held-out manifest.
