@@ -77,13 +77,13 @@ service_request=birth certificate
 Save the recording anywhere outside the repository first, for example:
 
 ```text
-D:\DESKTOP\Buriro\Recordings\tz-sw-en-001.wav
+C:\recordings\tz-sw-en-001.wav
 ```
 
 Then add it to the ignored private workspace:
 
 ```powershell
-$clip = "D:\DESKTOP\Buriro\Recordings\tz-sw-en-001.wav"
+$clip = "C:\recordings\tz-sw-en-001.wav"
 $reference = "Ninaishi Mbozi District, occupation yangu ni farmer, " + `
   "household ina watu sita, nataka birth certificate."
 
