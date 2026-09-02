@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "sautiform-africa"
-version = "0.1.0"
+version = "0.2.0"
 description = "Code-switching voice assistant for accurate public-service form completion"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -14,9 +14,22 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8,<9", "ruff>=0.6,<1"]
+dev = ["pytest>=8,<10", "ruff>=0.6,<1"]
+demo = ["streamlit>=1.37,<2"]
 whisper = ["openai-whisper>=20231117"]
-mms = ["transformers>=4.44,<5", "torch>=2.2"]
+mms = [
+  "transformers>=4.44,<5",
+  "torch>=2.2",
+  "soundfile>=0.12",
+]
+omni = ["omnilingual-asr>=0.2,<1"]
+all-models = [
+  "openai-whisper>=20231117",
+  "transformers>=4.44,<5",
+  "torch>=2.2",
+  "soundfile>=0.12",
+  "omnilingual-asr>=0.2,<1",
+]
 
 [project.scripts]
 sautiform = "sautiform.cli:main"
