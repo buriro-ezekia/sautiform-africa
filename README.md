@@ -104,6 +104,20 @@ SAHARA_API_KEY=...
 The request and response fields remain configurable because the participant onboarding contract is
 the authority for the actual Sahara API shape. See `docs/SAHARA_SETUP.md`.
 
+## Private benchmark collection
+
+The repository includes a local-only collection path that keeps raw recordings and the working
+manifest outside version control. Start with one consented clip, validate it, and run Whisper before
+collecting the larger pilot set.
+
+```powershell
+python scripts/add_benchmark_sample.py --help
+python scripts/check_whisper_ready.py
+```
+
+See `docs/BENCHMARK_COLLECTION_PROTOCOL.md` for the reference-first collection procedure, the first
+smoke-test utterance, manifest freezing and the exact Whisper command.
+
 ## Consent-aware benchmark manifest
 
 Benchmark audio is deliberately excluded from the public repository. Each JSONL row contains a
