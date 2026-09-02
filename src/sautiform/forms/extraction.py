@@ -30,17 +30,33 @@ _NUMBER_WORDS = {
 }
 
 _DISTRICT_PATTERNS = [
-    re.compile(r"(?:ninaishi|naishi|I live in|district(?: yangu)?(?: ni)?)\s+([A-Za-z-]+)(?:\s+District)?", re.I),
+    re.compile(
+        r"(?:ninaishi|naishi|I live in|district(?: yangu)?(?: ni)?)"
+        r"\s+([A-Za-z-]+)(?:\s+District)?",
+        re.I,
+    ),
 ]
 _OCCUPATION_PATTERNS = [
-    re.compile(r"(?:occupation(?: yangu)?(?: ni)?|kazi yangu ni|I work as(?: a)?)\s+([A-Za-z -]+?)(?=,|\.|\band\b|\bna\b|$)", re.I),
+    re.compile(
+        r"(?:occupation(?: yangu)?(?: ni)?|kazi yangu ni|I work as(?: a)?)"
+        r"\s+([A-Za-z -]+?)(?=,|\.|\band\b|\bna\b|$)",
+        re.I,
+    ),
 ]
 _HOUSEHOLD_PATTERNS = [
-    re.compile(r"(?:household(?: yangu)?(?: ina| has)?|familia(?: yangu)?(?: ina)?)(?:\s+watu)?\s+(\d+|[A-Za-z]+)", re.I),
+    re.compile(
+        r"(?:household(?: yangu)?(?: ina| has)?|familia(?: yangu)?(?: ina)?)"
+        r"(?:\s+watu)?\s+(\d+|[A-Za-z]+)",
+        re.I,
+    ),
     re.compile(r"(\d+|[A-Za-z]+)\s+(?:people|members|watu)\b", re.I),
 ]
 _SERVICE_PATTERNS = [
-    re.compile(r"(?:nataka|nahitaji|I need|service(?: request)?(?: ni)?)\s+([A-Za-z -]+?)(?=,|\.|$)", re.I),
+    re.compile(
+        r"(?:nataka|nahitaji|I need|service(?: request)?(?: ni)?)"
+        r"\s+([A-Za-z -]+?)(?=,|\.|$)",
+        re.I,
+    ),
 ]
 
 

@@ -39,7 +39,9 @@ class SaharaBackend:
         value: object = payload
         for key in self.response_text_path.split("."):
             if not isinstance(value, dict) or key not in value:
-                raise RuntimeError(f"Transcript path '{self.response_text_path}' missing in response")
+                raise RuntimeError(
+                    f"Transcript path '{self.response_text_path}' missing in response"
+                )
             value = value[key]
         if not isinstance(value, str):
             raise RuntimeError("Configured Sahara transcript value is not text")

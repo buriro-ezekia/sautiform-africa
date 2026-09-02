@@ -18,7 +18,11 @@ def _parser() -> argparse.ArgumentParser:
     demo.add_argument("--text", required=True)
 
     transcribe = sub.add_parser("transcribe", help="Transcribe an audio file")
-    transcribe.add_argument("--backend", choices=["sahara", "whisper", "mms", "http"], required=True)
+    transcribe.add_argument(
+        "--backend",
+        choices=["sahara", "whisper", "mms", "http"],
+        required=True,
+    )
     transcribe.add_argument("--audio", type=Path, required=True)
     return parser
 

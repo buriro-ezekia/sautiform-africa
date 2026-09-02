@@ -21,7 +21,11 @@ class MockBackend:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--manifest", type=Path, required=True)
-    parser.add_argument("--backend", choices=["sahara", "whisper", "mms", "http", "mock"], required=True)
+    parser.add_argument(
+        "--backend",
+        choices=["sahara", "whisper", "mms", "http", "mock"],
+        required=True,
+    )
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
 

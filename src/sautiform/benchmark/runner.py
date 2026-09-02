@@ -32,7 +32,10 @@ def run_manifest(manifest: Path, backend) -> dict[str, object]:
                     "wer": word_error_rate(item["reference_transcript"], result.text),
                     "cer": character_error_rate(item["reference_transcript"], result.text),
                     "field_exact_match": field_exact_match(reference_form, predicted_form),
-                    "complete_form_accuracy": complete_form_accuracy(reference_form, predicted_form),
+                    "complete_form_accuracy": complete_form_accuracy(
+                        reference_form,
+                        predicted_form,
+                    ),
                     "latency_seconds": result.latency_seconds,
                 }
             )
