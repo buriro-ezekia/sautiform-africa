@@ -38,11 +38,18 @@ This corresponds to 29 exactly correct required fields out of 96 and zero comple
 out of 24. These are final held-out results and must not be used to tune the parser, Whisper model
 configuration or benchmark references.
 
+## Meta MMS configuration
+
+MMS uses `facebook/mms-1b-all` with the Swahili adapter code `swh`. Earlier local setup used
+`swa`, which is not a vocabulary key for this checkpoint. The repository now normalises `sw` and
+`swa` to `swh` before model loading. This is a configuration correction made before any MMS
+held-out inference and does not change the frozen benchmark, parser or references.
+
 ## Remaining systems
 
 The same frozen manifest must be used, without modification, for:
 
-1. Meta MMS with the declared Swahili adapter;
+1. Meta MMS with `target_lang=swh`;
 2. Meta Omnilingual ASR;
 3. Intron Sahara v2.5.
 

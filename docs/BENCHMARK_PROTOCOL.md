@@ -18,8 +18,9 @@ The default Omnilingual configuration is `omniASR_CTC_300M_v2`, selected as the 
 model. Meta's reference implementation currently limits CTC and LLM inference to audio shorter than
 40 seconds, so benchmark clips used with this backend must satisfy that constraint.
 
-MMS is configured with the Swahili language adapter by default. Because code-switching performance
-may differ from monolingual performance, this limitation must be stated when interpreting results.
+MMS is configured with the Swahili language adapter `swh`. The adapter is monolingual, so its
+code-switching limitation must be stated when interpreting results. The repository accepts the
+common aliases `sw` and `swa` but normalises both to the model's `swh` adapter code.
 
 ## Manifest requirements
 
