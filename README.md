@@ -51,7 +51,7 @@ completed correctly.
 
 ## Local development
 
-Python 3.12 is recommended for the full Phase 2 environment. The published `omnilingual-asr` 0.2.0 package used by the v2 Omnilingual comparator supports Python 3.10-3.12, so Python 3.13+ is intentionally unsupported for the complete four-model environment.
+Python 3.12 remains suitable for the core application, Whisper and MMS. Meta Omnilingual ASR is evaluated separately under WSL2/Linux with Python 3.10 or 3.11 because its published 0.2.0 package metadata rejects normal Python 3.12 patch releases and its `fairseq2n` dependency does not publish native Windows wheels.
 
 ```powershell
 py -3.12 -m venv .venv
@@ -90,8 +90,8 @@ Install backends separately rather than downloading every model at once:
 ```powershell
 python -m pip install -e ".[whisper]"
 python -m pip install -e ".[mms]"
-python -m pip install -e ".[omni]"
-python scripts/check_omni_ready.py
+# Omnilingual ASR: use WSL2/Linux with Python 3.10 or 3.11.
+# See docs/OMNILINGUAL_SETUP.md
 ```
 
 Sahara uses participant credentials supplied through environment variables. Copy `.env.example`
@@ -123,7 +123,7 @@ design is in `docs/HELDOUT_COLLECTION_PLAN.md`; `scripts/ingest_heldout_plan.py`
 batch-ingestion path that performs no ASR inference. `docs/HELDOUT_FREEZE.md` records the frozen
 24-row manifest identity and the SHA-256 guard required for every final model run. Aggregate final
 held-out results are recorded in `docs/FINAL_HELDOUT_EVALUATION.md`; private audio and per-clip
-held-out transcripts remain outside version control.
+held-out transcripts remain outside version control. `docs/OMNILINGUAL_SETUP.md` documents the separate WSL2/Linux runtime required for the Omnilingual comparator.
 
 ## Consent-aware benchmark manifest
 

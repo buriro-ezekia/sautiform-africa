@@ -1,30 +1,39 @@
-"""Check Python and package readiness for Meta Omnilingual ASR."""
+"""Check runtime and package readiness for Meta Omnilingual ASR."""
 from __future__ import annotations
 
+import platform
 import sys
+
+from sautiform.asr.omni_runtime import omni_runtime_error
 
 
 def main() -> None:
-    if not ((3, 10) <= sys.version_info[:2] <= (3, 12)):
+    system = platform.system()
+    version = sys.version_info[:2]
+    error = omni_runtime_error(
+        platform_name=system,
+        python_version=version,
+    )
+    if error:
         raise SystemExit(
-            "OMNI_PYTHON_COMPATIBLE=NO "
-            f"python={sys.version_info.major}.{sys.version_info.minor}; "
-            "omnilingual-asr 0.2.0 requires Python 3.10-3.12"
+            "OMNI_RUNTIME_COMPATIBLE=NO "
+            f"platform={system} python={version[0]}.{version[1]}; {error}"
         )
 
     try:
         import omnilingual_asr
     except ImportError as exc:
         raise SystemExit(
-            "OMNI_PACKAGE_IMPORT=FAIL; install with python -m pip install -e \".[omni]\""
+            "OMNI_PACKAGE_IMPORT=FAIL; install with "
+            'python -m pip install -e ".[omni]"'
         ) from exc
 
-    version = getattr(omnilingual_asr, "__version__", "unknown")
+    package_version = getattr(omnilingual_asr, "__version__", "unknown")
     print(
-        "OMNI_PYTHON_COMPATIBLE=YES "
-        f"python={sys.version_info.major}.{sys.version_info.minor}"
+        "OMNI_RUNTIME_COMPATIBLE=YES "
+        f"platform={system} python={version[0]}.{version[1]}"
     )
-    print(f"OMNI_PACKAGE_IMPORT=PASS version={version}")
+    print(f"OMNI_PACKAGE_IMPORT=PASS version={package_version}")
 
 
 if __name__ == "__main__":
