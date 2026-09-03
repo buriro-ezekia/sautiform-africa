@@ -29,26 +29,29 @@ Open WSL and move to the existing repository:
 cd "/mnt/d/DESKTOP/Buriro/GitHub Desktop/SautiForm Africa/sautiform-africa"
 ```
 
-Find an available compatible interpreter:
+Ubuntu 24.04 ships Python 3.12 by default and may not provide Python 3.11 in the enabled APT
+repositories. Use Astral `uv` to install and manage a compatible Python 3.11 interpreter without
+changing the system Python:
 
 ```bash
-python3.11 --version 2>/dev/null || true
-python3.10 --version 2>/dev/null || true
-```
+curl -LsSf https://astral.sh/uv/install.sh | sh
+source "$HOME/.local/bin/env" 2>/dev/null || export PATH="$HOME/.local/bin:$PATH"
 
-Use Python 3.11 when available, otherwise Python 3.10. For Python 3.11:
+uv --version
+uv python install 3.11
 
-```bash
 mkdir -p ~/.venvs
-python3.11 -m venv ~/.venvs/sautiform-omni311
+uv venv --python 3.11 ~/.venvs/sautiform-omni311
 source ~/.venvs/sautiform-omni311/bin/activate
 
+python --version
 python -m pip install --upgrade pip
 python -m pip install -e ".[dev,omni]"
 python scripts/check_omni_ready.py
 ```
 
-For Python 3.10, replace `python3.11` and the environment name accordingly.
+The managed interpreter remains isolated from Ubuntu's system Python and from the Windows virtual
+environment used for Whisper and MMS.
 
 The required readiness markers are:
 
