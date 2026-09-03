@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 
 from sautiform.asr.factory import CHALLENGE_BACKENDS, build_backend
+from sautiform.benchmark.integrity import verify_sha256
 from sautiform.benchmark.manifest import load_validated_manifest
 from sautiform.benchmark.runner import run_rows
 
@@ -25,7 +26,18 @@ def main() -> None:
         action="store_true",
         help="Record a backend failure and continue with the remaining models.",
     )
+    parser.add_argument(
+        "--expected-manifest-sha256",
+        help=(
+            "Fail before model loading if the manifest does not match this "
+            "frozen SHA-256 digest."
+        ),
+    )
     args = parser.parse_args()
+
+    if args.expected_manifest_sha256:
+        digest = verify_sha256(args.manifest, args.expected_manifest_sha256)
+        print(f"MANIFEST_SHA256_VERIFIED={digest}")
 
     rows = load_validated_manifest(args.manifest, check_audio=True)
     reports: dict[str, object] = {}

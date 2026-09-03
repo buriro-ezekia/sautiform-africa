@@ -7,11 +7,12 @@ from pathlib import Path
 
 from sautiform.asr.base import TranscriptResult
 from sautiform.asr.factory import SUPPORTED_BACKENDS, build_backend
+from sautiform.benchmark.integrity import verify_sha256
 from sautiform.benchmark.runner import run_manifest
 
 
 class MockBackend:
-    """Deterministic local backend that reads ``<audio suffix>.txt`` sidecars."""
+    """Deterministic local backend that reads transcript sidecars."""
 
     name = "mock"
 
@@ -33,7 +34,18 @@ def main() -> None:
         required=True,
     )
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument(
+        "--expected-manifest-sha256",
+        help=(
+            "Fail before model loading if the manifest does not match this "
+            "frozen SHA-256 digest."
+        ),
+    )
     args = parser.parse_args()
+
+    if args.expected_manifest_sha256:
+        digest = verify_sha256(args.manifest, args.expected_manifest_sha256)
+        print(f"MANIFEST_SHA256_VERIFIED={digest}")
 
     backend = (
         MockBackend()
