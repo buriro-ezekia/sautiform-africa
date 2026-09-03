@@ -120,7 +120,9 @@ freezing and the exact Whisper command. `docs/DEVELOPMENT_LOCK.md` records the l
 configuration and the boundary between development and held-out evaluation. The fixed 24-clip final
 design is in `docs/HELDOUT_COLLECTION_PLAN.md`; `scripts/ingest_heldout_plan.py` provides a guarded
 batch-ingestion path that performs no ASR inference. `docs/HELDOUT_FREEZE.md` records the frozen
-24-row manifest identity and the SHA-256 guard required for every final model run.
+24-row manifest identity and the SHA-256 guard required for every final model run. Aggregate final
+held-out results are recorded in `docs/FINAL_HELDOUT_EVALUATION.md`; private audio and per-clip
+held-out transcripts remain outside version control.
 
 ## Consent-aware benchmark manifest
 
@@ -175,7 +177,6 @@ See `docs/RESPONSIBLE_AI.md`, `docs/BENCHMARK_PROTOCOL.md` and
 
 Version `0.2.0` is the Phase 2 candidate. The 10-clip development pilot is locked and remains
 strictly development-only. Whisper is locked to `turbo`, forced Swahili (`sw`) and temperature zero,
-and the parser is frozen after its final bounded hardening pass. Real competition scores remain
-intentionally absent until the fixed 24-clip consented held-out evaluation set is recorded, validated,
-frozen and run through all four ASR systems on the identical manifest. The frozen held-out manifest SHA-256
+and the parser is frozen after its final bounded hardening pass. The final 24-clip held-out benchmark is frozen. Whisper has completed its final held-out run; MMS,
+Omnilingual ASR and Sahara remain pending on the identical frozen manifest. The frozen held-out manifest SHA-256
 is `794eddca2d656b176c0064dd7edd92da61b79266d113287de47247dc72a16448`.
