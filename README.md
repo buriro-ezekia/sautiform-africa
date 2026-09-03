@@ -51,7 +51,7 @@ completed correctly.
 
 ## Local development
 
-Python 3.12 is recommended for the full Phase 2 environment.
+Python 3.12 is recommended for the full Phase 2 environment. The published `omnilingual-asr` 0.2.0 package used by the v2 Omnilingual comparator supports Python 3.10-3.12, so Python 3.13+ is intentionally unsupported for the complete four-model environment.
 
 ```powershell
 py -3.12 -m venv .venv
@@ -91,6 +91,7 @@ Install backends separately rather than downloading every model at once:
 python -m pip install -e ".[whisper]"
 python -m pip install -e ".[mms]"
 python -m pip install -e ".[omni]"
+python scripts/check_omni_ready.py
 ```
 
 Sahara uses participant credentials supplied through environment variables. Copy `.env.example`

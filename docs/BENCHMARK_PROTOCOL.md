@@ -15,7 +15,8 @@ The challenge matrix uses four explicitly named systems:
 4. Meta Omnilingual ASR.
 
 The default Omnilingual configuration is `omniASR_CTC_300M_v2`, selected as the lighter comparison
-model. Meta's reference implementation currently limits CTC and LLM inference to audio shorter than
+model. The repository pins `omnilingual-asr==0.2.0`; the published package supports Python 3.10-3.12,
+so Omnilingual evaluation must run in one of those interpreter versions. Meta's reference implementation currently limits CTC and LLM inference to audio shorter than
 40 seconds, so benchmark clips used with this backend must satisfy that constraint.
 
 MMS is configured with the Swahili language adapter `swh`. The adapter is monolingual, so its
