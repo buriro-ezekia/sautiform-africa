@@ -118,7 +118,8 @@ python scripts/check_whisper_ready.py
 See `docs/BENCHMARK_COLLECTION_PROTOCOL.md` for the reference-first collection procedure, manifest
 freezing and the exact Whisper command. `docs/DEVELOPMENT_LOCK.md` records the locked development
 configuration and the boundary between development and held-out evaluation. The fixed 24-clip final
-design is in `docs/HELDOUT_COLLECTION_PLAN.md`.
+design is in `docs/HELDOUT_COLLECTION_PLAN.md`; `scripts/ingest_heldout_plan.py` provides a guarded
+batch-ingestion path that performs no ASR inference.
 
 ## Consent-aware benchmark manifest
 

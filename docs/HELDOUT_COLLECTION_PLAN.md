@@ -102,6 +102,27 @@ tz-sw-en-h024.ogg
 Other supported audio extensions are acceptable, but each ID must resolve to exactly one source
 recording.
 
+## Batch ingestion
+
+After listening to all 24 source recordings and confirming that each clip matches the fixed
+reference transcript and structured meaning, preflight the folder without writing anything:
+
+```powershell
+python scripts/ingest_heldout_plan.py `
+  --source-dir "D:\DESKTOP\Buriro\GitHub Desktop\SautiForm Africa\Texts & Audios\Heldout Audios" `
+  --device-a "laptop microphone" `
+  --device-b "laptop microphone" `
+  --dry-run
+```
+
+If Device B was a different physical device, replace the second label with its factual description.
+The dry run verifies exact sample stems, supported formats, file-size safeguards and, where
+`ffprobe` is available, clip duration. It performs no copying, manifest write or ASR inference.
+
+After the dry run passes, rerun without `--dry-run` and add
+`--confirm-recordings-match-plan`. That explicit flag records the human assertion that every clip
+was listened to and agrees with the fixed plan.
+
 ## Pre-freeze gate
 
 After all 24 clips are ingested:
