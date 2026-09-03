@@ -177,6 +177,6 @@ See `docs/RESPONSIBLE_AI.md`, `docs/BENCHMARK_PROTOCOL.md` and
 
 Version `0.2.0` is the Phase 2 candidate. The 10-clip development pilot is locked and remains
 strictly development-only. Whisper is locked to `turbo`, forced Swahili (`sw`) and temperature zero,
-and the parser is frozen after its final bounded hardening pass. The final 24-clip held-out benchmark is frozen. Whisper has completed its final held-out run; MMS,
-Omnilingual ASR and Sahara remain pending on the identical frozen manifest. The frozen held-out manifest SHA-256
+and the parser is frozen after its final bounded hardening pass. The final 24-clip held-out benchmark is frozen. Whisper and MMS have completed their final held-out
+runs; Omnilingual ASR and Sahara remain pending on the identical frozen manifest. The frozen held-out manifest SHA-256
 is `794eddca2d656b176c0064dd7edd92da61b79266d113287de47247dc72a16448`.
