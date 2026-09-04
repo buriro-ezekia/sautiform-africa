@@ -9,6 +9,32 @@ The project is being developed for the Sahara CodeSwitch Africa Challenge under 
 Services**. Speech recognition is intentionally separated from downstream form logic so that the
 same consented audio can be benchmarked fairly across multiple ASR systems.
 
+## Challenge demo and submission evidence
+
+**Demo video:** [Watch the SautiForm Africa demo on YouTube](https://youtu.be/9O7gOxYTBM8)  
+**Benchmark report:** [Open the final 3-page PDF](docs/SautiForm_Africa_Benchmark_Report.pdf)  
+**Submission package:** [Review the challenge evidence index](docs/SUBMISSION_INDEX.md)
+
+[![SautiForm Africa demo](https://img.youtube.com/vi/9O7gOxYTBM8/maxresdefault.jpg)](https://youtu.be/9O7gOxYTBM8)
+
+The live product uses **Intron Sahara v2.5** for Kiswahili-English code-switched speech. A verified
+end-to-end run transcribed a mixed-language utterance, extracted district, occupation, household
+size and service request, presented an editable read-back and required explicit human confirmation
+before stopping without external government submission.
+
+### Final held-out benchmark
+
+| Model | WER ↓ | CER ↓ | Field exact match ↑ | Exact fields | Complete forms |
+|---|---:|---:|---:|---:|---:|
+| **Intron Sahara v2.5** | **0.4592** | 0.2559 | 0.2500 | 24/96 | 0/24 |
+| **OpenAI Whisper Turbo** | 0.5074 | **0.1660** | **0.3021** | **29/96** | 0/24 |
+| **Meta MMS** | 0.7067 | 0.2759 | 0.0625 | 6/96 | 0/24 |
+| **Meta Omnilingual ASR** | 0.7634 | 0.2790 | 0.0729 | 7/96 | 0/24 |
+
+The final candidate passed the local acceptance gate with **Ruff PASS, 55/55 tests PASS and Python
+compilation PASS**. The 24-clip held-out benchmark is frozen and no post-hoc model, parser or
+reference tuning is permitted.
+
 ## Application workflow
 
 ```text
