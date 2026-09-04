@@ -45,13 +45,24 @@ uv venv --python 3.11 ~/.venvs/sautiform-omni311
 source ~/.venvs/sautiform-omni311/bin/activate
 
 python --version
-python -m pip install --upgrade pip
-python -m pip install -e ".[dev,omni]"
+uv pip install -e ".[dev,omni]"
+
+# The default fairseq2n wheel may target CUDA. For this CPU-only benchmark,
+# replace it with Meta's fairseq2n CPU variant that exactly matches PyTorch.
+bash scripts/repair_omni_cpu_variant.sh
+
 python scripts/check_omni_ready.py
 ```
 
 The managed interpreter remains isolated from Ubuntu's system Python and from the Windows virtual
 environment used for Whisper and MMS.
+
+Omnilingual ASR 0.2.0 allows `fairseq2[arrow]` versions from 0.5.2 through 0.6.0. fairseq2's native
+wheel (`fairseq2n`) is hardware-specific and must match both the installed PyTorch version and its
+CPU/CUDA variant. SautiForm's WSL benchmark is CPU-only, so `scripts/repair_omni_cpu_variant.sh`
+reads the installed PyTorch and fairseq2n versions and reinstalls the matching CPU fairseq2n wheel
+from Meta's official fairseq2 package index. A CUDA-targeted fairseq2n wheel with CPU PyTorch is an
+invalid combination even when both report PyTorch 2.8.0.
 
 The required readiness markers are:
 

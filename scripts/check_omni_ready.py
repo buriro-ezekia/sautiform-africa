@@ -4,7 +4,10 @@ from __future__ import annotations
 import platform
 import sys
 
-from sautiform.asr.omni_runtime import omni_runtime_error
+from sautiform.asr.omni_runtime import (
+    omni_import_error_hint,
+    omni_runtime_error,
+)
 
 
 def main() -> None:
@@ -22,10 +25,12 @@ def main() -> None:
 
     try:
         import omnilingual_asr
-    except ImportError as exc:
+    except Exception as exc:
+        hint = omni_import_error_hint(str(exc))
+        detail = f"; {hint}" if hint else ""
         raise SystemExit(
-            "OMNI_PACKAGE_IMPORT=FAIL; install with "
-            'python -m pip install -e ".[omni]"'
+            "OMNI_PACKAGE_IMPORT=FAIL "
+            f"error={type(exc).__name__}: {exc}{detail}"
         ) from exc
 
     package_version = getattr(omnilingual_asr, "__version__", "unknown")

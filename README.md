@@ -91,6 +91,7 @@ Install backends separately rather than downloading every model at once:
 python -m pip install -e ".[whisper]"
 python -m pip install -e ".[mms]"
 # Omnilingual ASR: use WSL2/Linux with Python 3.10 or 3.11.
+# CPU runs also require the matching fairseq2n CPU variant.
 # See docs/OMNILINGUAL_SETUP.md
 ```
 
