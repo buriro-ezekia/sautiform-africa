@@ -54,7 +54,8 @@ completed correctly.
 The written submission package is indexed in
 [`docs/SUBMISSION_INDEX.md`](docs/SUBMISSION_INDEX.md). It includes the polished Solution
 Description, four-model Benchmark Report, Ethics & Inclusion Note, demo-video script and final
-submission checklist.
+submission checklist. The judge-facing benchmark PDF is
+[`docs/SautiForm_Africa_Benchmark_Report.pdf`](docs/SautiForm_Africa_Benchmark_Report.pdf) and is intentionally limited to the required three pages.
 
 The benchmark is complete: Sahara, Whisper, MMS and Omnilingual were evaluated on the identical
 frozen 24-clip held-out manifest. No further parser or model tuning is permitted from those results.

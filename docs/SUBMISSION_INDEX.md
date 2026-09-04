@@ -6,10 +6,11 @@ Challenge.
 ## Core submission documents
 
 1. [Solution Description](SUBMISSION_SOLUTION_DESCRIPTION.md)
-2. [Benchmark Report](BENCHMARK_REPORT.md)
-3. [Ethics & Inclusion Note](ETHICS_AND_INCLUSION_NOTE.md)
-4. [Demo Video Script and Recording Plan](DEMO_VIDEO_SCRIPT.md)
-5. [Submission Checklist](SUBMISSION_CHECKLIST.md)
+2. [Submission Benchmark Report PDF](SautiForm_Africa_Benchmark_Report.pdf) - final 3-page judge-facing report
+3. [Full Benchmark Report](BENCHMARK_REPORT.md)
+4. [Ethics & Inclusion Note](ETHICS_AND_INCLUSION_NOTE.md)
+5. [Demo Video Script and Recording Plan](DEMO_VIDEO_SCRIPT.md)
+6. [Submission Checklist](SUBMISSION_CHECKLIST.md)
 
 ## Supporting technical evidence
 

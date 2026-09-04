@@ -5,8 +5,7 @@
 Show a complete, real Sahara-powered product flow, then demonstrate why the human-confirmation design
 is necessary using the final four-model benchmark.
 
-A target duration of roughly **3 minutes** keeps the story focused. If the submission portal imposes
-a different limit, trim the narration rather than speeding through the live product interaction.
+The submission limit is **5 minutes maximum** and the video must be hosted on YouTube as **Public** or **Unlisted** so judges can embed and view it. Target **3:15-3:45**: this leaves margin for live API latency while keeping the story focused. The recording must visibly demonstrate genuine Kiswahili-English code-mixing.
 
 ## Before recording
 
@@ -20,6 +19,8 @@ to canonical 16 kHz mono PCM and uploads it as AAC/M4A, a format already proven 
 7. Test microphone permission.
 8. Keep the benchmark table open separately for the evidence section.
 9. Do not use a held-out benchmark clip as the live demo input.
+10. Keep `docs/SautiForm_Africa_Benchmark_Report.pdf` open for the evidence section.
+11. After recording, upload to YouTube as Public or Unlisted and verify playback in a signed-out/private browser window.
 
 ## Suggested narration
 
@@ -49,7 +50,7 @@ to canonical 16 kHz mono PCM and uploads it as AAC/M4A, a format already proven 
 
 **On screen:** Streamlit application. Do not show the API key.
 
-Record a fresh utterance such as:
+Record a fresh, clearly code-mixed utterance such as:
 
 > Ninaishi Mbozi District, occupation yangu ni farmer, household ina watu sita, nataka birth
 > certificate.
@@ -85,7 +86,7 @@ Tick the confirmation checkbox only after reviewing the fields.
 
 ## 1:35–2:25 — Benchmark evidence
 
-**On screen:** Final four-model table from `docs/BENCHMARK_REPORT.md`.
+**On screen:** Final four-model table from `docs/SautiForm_Africa_Benchmark_Report.pdf`.
 
 **Narration:**
 
@@ -132,6 +133,8 @@ Pause on the complete-form column.
   than rerecording solely to obtain a perfect transcript.
 - Avoid claiming production deployment, government integration or measured population impact.
 - Keep the four-model result table on screen long enough to read the key values.
+- Keep the final video comfortably below 5:00; aim for 3:15-3:45.
+- Upload as YouTube Public or Unlisted, never Private.
 
 ## Evidence to capture in the final recording
 
