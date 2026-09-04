@@ -49,6 +49,16 @@ Complete-form accuracy is the primary downstream task metric. WER and CER remain
 measures, but transcription quality alone does not establish that a public-service record was
 completed correctly.
 
+## Challenge submission package
+
+The written submission package is indexed in
+[`docs/SUBMISSION_INDEX.md`](docs/SUBMISSION_INDEX.md). It includes the polished Solution
+Description, four-model Benchmark Report, Ethics & Inclusion Note, demo-video script and final
+submission checklist.
+
+The benchmark is complete: Sahara, Whisper, MMS and Omnilingual were evaluated on the identical
+frozen 24-clip held-out manifest. No further parser or model tuning is permitted from those results.
+
 ## Local development
 
 Python 3.12 remains suitable for the core application, Whisper and MMS. Meta Omnilingual ASR is evaluated separately under WSL2/Linux with Python 3.10 or 3.11 because its published 0.2.0 package metadata rejects normal Python 3.12 patch releases and its `fairseq2n` dependency does not publish native Windows wheels.
@@ -76,12 +86,14 @@ Install the lightweight demo dependency and start Streamlit:
 
 ```powershell
 python -m pip install -e ".[demo]"
+$env:SAHARA_API_KEY = "<PRIVATE_INTRON_API_KEY>"
 streamlit run app.py
 ```
 
-The interface supports microphone input when a configured ASR backend is available. It also accepts
-a transcript directly, which allows the downstream workflow and confirmation gate to be tested
-without downloading a speech model.
+The competition product path is fixed to **Intron Sahara v2.5** for live Swahili-English speech.
+Whisper, MMS and Omnilingual remain benchmark comparators rather than selectable demo backends. A
+developer transcript fallback is retained only for testing the downstream form workflow without an
+API call.
 
 ## Speech backends
 

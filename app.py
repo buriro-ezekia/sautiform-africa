@@ -1,4 +1,4 @@
-"""Streamlit demo for human-confirmed public-service form completion."""
+"""Streamlit demo for Sahara-powered, human-confirmed public-service form completion."""
 from __future__ import annotations
 
 import tempfile
@@ -6,7 +6,7 @@ from pathlib import Path
 
 import streamlit as st
 
-from sautiform.asr.factory import CHALLENGE_BACKENDS, build_backend
+from sautiform.asr.factory import build_backend
 from sautiform.dialogue.engine import next_prompt
 from sautiform.forms.extraction import extract_form
 from sautiform.forms.public_service import PublicServiceForm
@@ -25,37 +25,48 @@ st.info(
     "administrative decisions and does not submit data to a government system."
 )
 
-backend_name = st.selectbox(
-    "Speech model",
-    CHALLENGE_BACKENDS,
-    help="Use the same benchmark audio when comparing models.",
+backend_name = "sahara"
+st.markdown("**Speech recognition:** Intron Sahara v2.5 · Swahili–English")
+st.caption(
+    "The product demo is intentionally fixed to Sahara. Comparison models are "
+    "available only through the benchmark scripts."
 )
+
 audio = st.audio_input("Record a Kiswahili–English response")
-manual_text = st.text_area(
-    "Or test with a transcript",
-    placeholder=(
-        "Ninaishi Mbozi District, occupation yangu ni farmer, "
-        "household ina watu sita, nataka birth certificate."
-    ),
-)
+
+with st.expander("Developer transcript fallback"):
+    manual_text = st.text_area(
+        "Test the downstream form workflow without calling Sahara",
+        placeholder=(
+            "Ninaishi Mbozi District, occupation yangu ni farmer, "
+            "household ina watu sita, nataka birth certificate."
+        ),
+    )
+    st.caption(
+        "This fallback is for software testing only. A competition demo should "
+        "use recorded audio so the Sahara API is exercised."
+    )
 
 transcript: str | None = None
 if st.button("Process response", type="primary"):
-    if manual_text.strip():
-        transcript = manual_text.strip()
-    elif audio is not None:
+    if audio is not None:
         with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp:
             temp.write(audio.getvalue())
             temp_path = Path(temp.name)
         try:
-            with st.spinner(f"Transcribing with {backend_name}..."):
+            with st.spinner("Transcribing with Intron Sahara v2.5..."):
                 transcript = build_backend(backend_name).transcribe(temp_path).text
         except Exception as exc:
             st.error(f"Transcription failed: {type(exc).__name__}: {exc}")
         finally:
             temp_path.unlink(missing_ok=True)
+    elif manual_text.strip():
+        transcript = manual_text.strip()
+        st.info(
+            "Developer transcript fallback used. No Sahara API request was made."
+        )
     else:
-        st.warning("Record audio or provide a transcript first.")
+        st.warning("Record audio or provide a developer transcript first.")
 
 if transcript:
     st.session_state["transcript"] = transcript
