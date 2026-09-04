@@ -133,3 +133,15 @@ contains only 24 clips, but any rate-limit response must be treated as an operat
 not as a model-quality result.
 
 After the run, independently re-check the frozen manifest SHA-256 before accepting the result.
+
+
+## Development smoke-test lock
+
+The Intron Sahara synchronous API integration was successfully verified on one development-only
+recording before any Sahara held-out inference. The request completed with the fixed benchmark
+configuration above and returned a valid Sahara transcript. The observed smoke-test latency was
+16.55983063 seconds. This result is operational evidence only and is not part of the held-out
+benchmark.
+
+From this point onward, Sahara endpoint, language selection, LLM-correction setting, response path,
+parser rules and benchmark references are locked for the final 24-clip Sahara evaluation.
