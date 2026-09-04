@@ -1,4 +1,4 @@
-"""Configurable Sahara v2.5 HTTP adapter."""
+"""Intron Sahara v2.5 synchronous STT adapter."""
 from __future__ import annotations
 
 import json
@@ -9,6 +9,9 @@ from pathlib import Path
 import requests
 
 from sautiform.asr.base import TranscriptResult
+
+DEFAULT_SAHARA_URL = "https://infer.voice.intron.io/file/v1/upload/sync"
+DEFAULT_RESPONSE_TEXT_PATH = "data.audio_transcript"
 
 
 def _json_object_from_env(name: str) -> dict[str, object]:
@@ -28,39 +31,41 @@ class SaharaBackend:
     name = "sahara"
 
     def __init__(self) -> None:
-        self.url = os.getenv("SAHARA_API_URL")
+        self.url = os.getenv("SAHARA_API_URL", DEFAULT_SAHARA_URL)
         self.key = os.getenv("SAHARA_API_KEY")
-        self.auth_header = os.getenv("SAHARA_AUTH_HEADER", "Authorization")
-        self.auth_scheme = os.getenv("SAHARA_AUTH_SCHEME", "Bearer")
-        self.file_field = os.getenv("SAHARA_FILE_FIELD", "file")
-        self.model_field = os.getenv("SAHARA_MODEL_FIELD", "model")
-        self.model = os.getenv("SAHARA_MODEL")
-        self.response_text_path = os.getenv("SAHARA_RESPONSE_TEXT_PATH", "text")
+        self.language = os.getenv("SAHARA_LANGUAGE", "sw")
+        self.disable_llm_corrections = os.getenv(
+            "SAHARA_DISABLE_LLM_CORRECTIONS",
+            "TRUE",
+        )
+        self.response_text_path = os.getenv(
+            "SAHARA_RESPONSE_TEXT_PATH",
+            DEFAULT_RESPONSE_TEXT_PATH,
+        )
         self.timeout_seconds = float(os.getenv("SAHARA_TIMEOUT_SECONDS", "120"))
-        self.extra_headers = _json_object_from_env("SAHARA_HEADERS_JSON")
         self.extra_form = _json_object_from_env("SAHARA_FORM_JSON")
 
-        if not self.url or not self.key:
-            raise RuntimeError("SAHARA_API_URL and SAHARA_API_KEY are required")
-        if not self.auth_header.strip():
-            raise RuntimeError("SAHARA_AUTH_HEADER must not be empty")
+        if not self.key:
+            raise RuntimeError("SAHARA_API_KEY is required")
+        if not self.url.strip():
+            raise RuntimeError("SAHARA_API_URL must not be empty")
+        if not self.language.strip():
+            raise RuntimeError("SAHARA_LANGUAGE must not be empty")
         if self.timeout_seconds <= 0:
             raise RuntimeError("SAHARA_TIMEOUT_SECONDS must be greater than zero")
 
     def _headers(self) -> dict[str, str]:
-        headers = {str(key): str(value) for key, value in self.extra_headers.items()}
-        auth_value = (
-            f"{self.auth_scheme.strip()} {self.key}"
-            if self.auth_scheme.strip()
-            else self.key
-        )
-        headers[self.auth_header] = auth_value
-        return headers
+        return {"Authorization": f"Bearer {self.key}"}
 
-    def _form_data(self) -> dict[str, str]:
+    def _form_data(self, audio_path: Path) -> dict[str, str]:
         data = {str(key): str(value) for key, value in self.extra_form.items()}
-        if self.model:
-            data[self.model_field] = self.model
+        data.update(
+            {
+                "audio_file_name": audio_path.stem,
+                "use_language_asr_input": self.language,
+                "use_disable_llm_corrections": self.disable_llm_corrections,
+            }
+        )
         return data
 
     def transcribe(self, audio_path: Path) -> TranscriptResult:
@@ -69,8 +74,8 @@ class SaharaBackend:
             response = requests.post(
                 self.url,
                 headers=self._headers(),
-                data=self._form_data(),
-                files={self.file_field: (audio_path.name, handle)},
+                data=self._form_data(audio_path),
+                files={"audio_file_blob": (audio_path.name, handle)},
                 timeout=self.timeout_seconds,
             )
 
@@ -88,11 +93,11 @@ class SaharaBackend:
             raise RuntimeError("Configured Sahara transcript value is not text")
 
         metadata: dict[str, object] = {
-            "model": self.model or "unspecified",
-            "file_field": self.file_field,
+            "endpoint": self.url,
+            "language": self.language,
+            "code_switching": True,
+            "disable_llm_corrections": self.disable_llm_corrections,
             "response_text_path": self.response_text_path,
-            "auth_header": self.auth_header,
-            "auth_scheme": self.auth_scheme or "none",
         }
 
         return TranscriptResult(

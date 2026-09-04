@@ -1,4 +1,4 @@
-"""Validate Sahara configuration and optionally smoke-test development audio."""
+"""Validate Intron Sahara configuration and optionally smoke-test development audio."""
 from __future__ import annotations
 
 import argparse
@@ -23,19 +23,23 @@ def main() -> None:
     parser.add_argument(
         "--audio",
         type=Path,
-        help="Optional development audio clip for a single Sahara API smoke test.",
+        help="Optional development audio clip for one Sahara API smoke test.",
     )
     args = parser.parse_args()
 
     backend = SaharaBackend()
 
     print("SAHARA_CONFIG=PASS")
-    print(f"SAHARA_FILE_FIELD={backend.file_field}")
-    print(f"SAHARA_MODEL={backend.model or 'unspecified'}")
-    print(f"SAHARA_MODEL_FIELD={backend.model_field}")
+    print(f"SAHARA_API_URL={backend.url}")
+    print("SAHARA_AUTH=Bearer")
+    print("SAHARA_FILE_FIELD=audio_file_blob")
+    print("SAHARA_FILE_NAME_FIELD=audio_file_name")
+    print(f"SAHARA_LANGUAGE={backend.language}")
+    print(
+        "SAHARA_DISABLE_LLM_CORRECTIONS="
+        f"{backend.disable_llm_corrections}"
+    )
     print(f"SAHARA_RESPONSE_TEXT_PATH={backend.response_text_path}")
-    print(f"SAHARA_AUTH_HEADER={backend.auth_header}")
-    print(f"SAHARA_AUTH_SCHEME={backend.auth_scheme or 'none'}")
     print(f"SAHARA_TIMEOUT_SECONDS={backend.timeout_seconds:g}")
 
     if args.audio is None:
@@ -45,7 +49,9 @@ def main() -> None:
     _reject_heldout(audio)
 
     if not audio.is_file():
-        raise SystemExit(f"SAHARA_SMOKE_TEST=FAIL reason=audio_not_found path={audio}")
+        raise SystemExit(
+            f"SAHARA_SMOKE_TEST=FAIL reason=audio_not_found path={audio}"
+        )
 
     result = backend.transcribe(audio)
     print("SAHARA_SMOKE_TEST=PASS")
