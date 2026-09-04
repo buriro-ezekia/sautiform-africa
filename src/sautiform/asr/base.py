@@ -11,6 +11,7 @@ class TranscriptResult:
     text: str
     backend: str
     latency_seconds: float | None = None
+    metadata: dict[str, object] | None = None
 
 
 class ASRBackend(Protocol):

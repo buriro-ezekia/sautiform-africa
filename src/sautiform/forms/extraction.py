@@ -1,4 +1,4 @@
-"""Deterministic extraction for the first Kiswahili-English public-service prototype."""
+"""Deterministic extraction for the Kiswahili-English public-service prototype."""
 from __future__ import annotations
 
 import re
@@ -9,9 +9,13 @@ from sautiform.forms.public_service import PublicServiceForm
 _NUMBER_WORDS = {
     "moja": 1,
     "mbili": 2,
+    "wawili": 2,
     "tatu": 3,
+    "watatu": 3,
     "nne": 4,
+    "wanne": 4,
     "tano": 5,
+    "watano": 5,
     "sita": 6,
     "saba": 7,
     "nane": 8,
@@ -31,22 +35,41 @@ _NUMBER_WORDS = {
 
 _DISTRICT_PATTERNS = [
     re.compile(
-        r"(?:ninaishi|naishi|I live in|district(?: yangu)?(?: ni)?)"
+        r"(?:ninaishi|naishi|inaishi|naishu|I live in(?: the)?)"
         r"\s+([A-Za-z-]+)(?:\s+District)?",
+        re.I,
+    ),
+    re.compile(
+        r"district(?: yangu)?\s+ni\s+([A-Za-z-]+)",
+        re.I,
+    ),
+    re.compile(
+        r"(?:ninaishi\w*|naishi\w*)\s+([A-Za-z-]+)\s+district\b",
         re.I,
     ),
 ]
 _OCCUPATION_PATTERNS = [
     re.compile(
         r"(?:occupation(?: yangu)?(?: ni)?|kazi yangu ni|I work as(?: a)?)"
-        r"\s+([A-Za-z -]+?)(?=,|\.|\band\b|\bna\b|$)",
+        r"\s+([A-Za-z -]+?)"
+        r"(?=,|\.|\band\b|\bna\b|\bhousehold\b|\bfamilia\b|"
+        r"\bnataka\b|\bnahitaji\b|\bI need\b|\bservice\b|"
+        r"\b[A-Za-z]{3,16}\s+yangu\s+ina\b|$)",
+        re.I,
+    ),
+    re.compile(
+        r"\b[A-Za-z]{5,16}\s+(?:yangu|angu)\s+ni\s+"
+        r"([A-Za-z-]+)"
+        r"(?=\s+household\b|\s+familia\b|\s+nataka\b|"
+        r"\s+nahitaji\b|,|\.|$)",
         re.I,
     ),
 ]
 _HOUSEHOLD_PATTERNS = [
     re.compile(
-        r"(?:household(?: yangu)?(?: ina| has)?|familia(?: yangu)?(?: ina)?)"
-        r"(?:\s+watu)?\s+(\d+|[A-Za-z]+)",
+        r"(?:household(?:i)?(?: yangu)?\s*(?:ina|has)?\s*"
+        r"(?:watu)?|familia(?: yangu)?(?: ina)?)"
+        r"\s+(\d+|[A-Za-z]+)",
         re.I,
     ),
     re.compile(r"(\d+|[A-Za-z]+)\s+(?:people|members|watu)\b", re.I),
@@ -64,6 +87,23 @@ def _normalise_words(value: str) -> str:
     return " ".join(value.strip().split())
 
 
+def _normalise_asr_spacing(text: str) -> str:
+    """Repair conservative token-boundary errors without changing content words."""
+    text = re.sub(r"\bhouseholdi\b", "household", text, flags=re.I)
+    text = re.sub(r"\binawatu\b", "ina watu", text, flags=re.I)
+    text = re.sub(r"\bna\s+itaji\b", "nahitaji", text, flags=re.I)
+    text = re.sub(r"\bnaitaji\b", "nahitaji", text, flags=re.I)
+    text = re.sub(r"\bwa\s+wili\b", "wawili", text, flags=re.I)
+    return _normalise_words(text)
+
+
+def _normalise_service(value: str) -> str:
+    """Canonicalise harmless articles and UK/US licence spelling only."""
+    value = _normalise_words(value).lower()
+    value = re.sub(r"^(?:a|the)\s+", "", value)
+    return re.sub(r"\blicense\b", "licence", value)
+
+
 def _parse_count(token: str) -> int | None:
     token = token.lower().strip()
     if token.isdigit():
@@ -72,9 +112,10 @@ def _parse_count(token: str) -> int | None:
 
 
 def extract_form(text: str, existing: PublicServiceForm | None = None) -> PublicServiceForm:
-    """Extract only explicit values; ambiguous or absent values remain unset."""
+    """Extract explicit values while tolerating limited ASR boundary variation."""
     form = existing or PublicServiceForm()
     updates: dict[str, object] = {}
+    text = _normalise_asr_spacing(text)
 
     for pattern in _DISTRICT_PATTERNS:
         match = pattern.search(text)
@@ -99,7 +140,7 @@ def extract_form(text: str, existing: PublicServiceForm | None = None) -> Public
     for pattern in _SERVICE_PATTERNS:
         match = pattern.search(text)
         if match:
-            updates["service_request"] = _normalise_words(match.group(1)).lower()
+            updates["service_request"] = _normalise_service(match.group(1))
             break
 
     return replace(form, **updates)
