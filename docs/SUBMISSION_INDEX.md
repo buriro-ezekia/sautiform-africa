@@ -3,6 +3,10 @@
 This directory contains the written competition package for the Sahara CodeSwitch Africa Main
 Challenge.
 
+## Demo video
+
+[Watch the final SautiForm Africa demo on YouTube](https://youtu.be/9O7gOxYTBM8)
+
 ## Core submission documents
 
 1. [Solution Description](SUBMISSION_SOLUTION_DESCRIPTION.md)
