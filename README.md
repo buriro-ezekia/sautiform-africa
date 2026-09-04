@@ -95,16 +95,19 @@ python -m pip install -e ".[mms]"
 # See docs/OMNILINGUAL_SETUP.md
 ```
 
-Sahara uses participant credentials supplied through environment variables. Copy `.env.example`
-only as a configuration reference; do not commit a populated `.env` file.
+Sahara uses the official Intron Voice synchronous STT endpoint. Only the private participant API key
+must be supplied locally; it must never be committed.
 
 ```text
-SAHARA_API_URL=...
 SAHARA_API_KEY=...
+SAHARA_API_URL=https://infer.voice.intron.io/file/v1/upload/sync
+SAHARA_LANGUAGE=sw
+SAHARA_DISABLE_LLM_CORRECTIONS=TRUE
+SAHARA_RESPONSE_TEXT_PATH=data.audio_transcript
 ```
 
-The request and response fields remain configurable because the participant onboarding contract is
-the authority for the actual Sahara API shape. See `docs/SAHARA_SETUP.md`.
+See `docs/SAHARA_SETUP.md` for the locked challenge configuration and development-only smoke-test
+boundary.
 
 ## Private benchmark collection
 
@@ -179,6 +182,10 @@ See `docs/RESPONSIBLE_AI.md`, `docs/BENCHMARK_PROTOCOL.md` and
 
 Version `0.2.0` is the Phase 2 candidate. The 10-clip development pilot is locked and remains
 strictly development-only. Whisper is locked to `turbo`, forced Swahili (`sw`) and temperature zero,
-and the parser is frozen after its final bounded hardening pass. The final 24-clip held-out benchmark is frozen. Whisper, MMS and Omnilingual ASR have completed their final held-out
-runs; Sahara remains pending on the identical frozen manifest. The frozen held-out manifest SHA-256
-is `794eddca2d656b176c0064dd7edd92da61b79266d113287de47247dc72a16448`.
+and the parser is frozen after its final bounded hardening pass. The final 24-clip held-out benchmark
+is frozen, and Sahara, Whisper, MMS and Omnilingual ASR have all completed their final runs on the
+identical manifest. Sahara achieved the lowest WER (0.4592) and mean latency (3.08 s), while Whisper
+achieved the lowest CER (0.1660) and highest field exact-match score (0.3021). All four systems scored
+0/24 on complete-form accuracy, reinforcing the need for clarification and explicit human
+confirmation. The frozen held-out manifest SHA-256 is
+`794eddca2d656b176c0064dd7edd92da61b79266d113287de47247dc72a16448`.
