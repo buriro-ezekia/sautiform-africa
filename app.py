@@ -1,15 +1,34 @@
 """Streamlit demo for Sahara-powered, human-confirmed public-service form completion."""
 from __future__ import annotations
 
+import os
 import tempfile
 from pathlib import Path
 
+import requests
 import streamlit as st
 
 from sautiform.asr.factory import build_backend
+from sautiform.demo_audio import DemoAudioError, normalise_microphone_wav
 from sautiform.dialogue.engine import next_prompt
 from sautiform.forms.extraction import extract_form
 from sautiform.forms.public_service import PublicServiceForm
+
+
+def _safe_transcription_error(exc: Exception) -> str:
+    """Return useful Sahara diagnostics without exposing the API key."""
+    response = getattr(exc, "response", None)
+    if isinstance(exc, requests.HTTPError) and response is not None:
+        detail = (response.text or "").strip()
+        secret = os.getenv("SAHARA_API_KEY", "")
+        if secret:
+            detail = detail.replace(secret, "[REDACTED]")
+        if len(detail) > 600:
+            detail = detail[:600] + "..."
+        suffix = f": {detail}" if detail else ""
+        return f"Sahara API returned HTTP {response.status_code}{suffix}"
+    return f"{type(exc).__name__}: {exc}"
+
 
 st.set_page_config(
     page_title="SautiForm Africa",
@@ -32,7 +51,10 @@ st.caption(
     "available only through the benchmark scripts."
 )
 
-audio = st.audio_input("Record a Kiswahili–English response")
+audio = st.audio_input(
+    "Record a Kiswahili–English response",
+    sample_rate=16_000,
+)
 
 with st.expander("Developer transcript fallback"):
     manual_text = st.text_area(
@@ -50,16 +72,43 @@ with st.expander("Developer transcript fallback"):
 transcript: str | None = None
 if st.button("Process response", type="primary"):
     if audio is not None:
-        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp:
-            temp.write(audio.getvalue())
-            temp_path = Path(temp.name)
+        raw_path: Path | None = None
+        prepared_path: Path | None = None
         try:
+            with tempfile.NamedTemporaryFile(
+                suffix=".wav",
+                delete=False,
+            ) as raw_temp:
+                raw_temp.write(audio.getvalue())
+                raw_path = Path(raw_temp.name)
+
+            with tempfile.NamedTemporaryFile(
+                suffix=".wav",
+                delete=False,
+            ) as prepared_temp:
+                prepared_path = Path(prepared_temp.name)
+
+            duration = normalise_microphone_wav(raw_path, prepared_path)
+            st.caption(
+                f"Prepared {duration:.1f}s microphone audio as "
+                "16 kHz mono PCM WAV."
+            )
+
             with st.spinner("Transcribing with Intron Sahara v2.5..."):
-                transcript = build_backend(backend_name).transcribe(temp_path).text
+                transcript = (
+                    build_backend(backend_name)
+                    .transcribe(prepared_path)
+                    .text
+                )
+        except DemoAudioError as exc:
+            st.error(f"Microphone audio preparation failed: {exc}")
         except Exception as exc:
-            st.error(f"Transcription failed: {type(exc).__name__}: {exc}")
+            st.error(f"Transcription failed: {_safe_transcription_error(exc)}")
         finally:
-            temp_path.unlink(missing_ok=True)
+            if raw_path is not None:
+                raw_path.unlink(missing_ok=True)
+            if prepared_path is not None:
+                prepared_path.unlink(missing_ok=True)
     elif manual_text.strip():
         transcript = manual_text.strip()
         st.info(
