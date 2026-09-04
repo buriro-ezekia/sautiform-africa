@@ -5,7 +5,7 @@
 | Deliverable | Repository evidence | Status |
 |---|---|---|
 | Solution Description | `docs/SUBMISSION_SOLUTION_DESCRIPTION.md` | Complete |
-| Demo video (public/unlisted YouTube, max 5 min) | `docs/DEMO_VIDEO_SCRIPT.md` | Live Sahara path verified; final recording/upload pending |
+| Demo video (public/unlisted YouTube, max 5 min) | https://youtu.be/9O7gOxYTBM8 | Complete |
 | Code / technical documentation | `README.md`, `docs/PHASE_2_SPECIFICATION.md`, setup and benchmark docs | Complete |
 | Benchmark Report PDF, max 3 pages | `docs/SautiForm_Africa_Benchmark_Report.pdf` | Complete: 3 pages, Sahara + 3 comparators |
 | Ethics & Inclusion Note | `docs/ETHICS_AND_INCLUSION_NOTE.md` | Complete |
@@ -37,8 +37,7 @@ No further parser or model tuning should be performed from held-out results.
 
 ## Before final submission
 
-- Record the final demo at no more than 5 minutes and visibly demonstrate Kiswahili-English code-mixing.
-- Upload the demo to YouTube as **Public** or **Unlisted** (never Private), then test the URL in a signed-out/private browser window.
+- Demo URL recorded: https://youtu.be/9O7gOxYTBM8. Confirm it remains Public or Unlisted and opens signed out before final submission.
 - Check that the video shows a real Sahara audio request.
 - Ensure the repository contains no API key, private benchmark audio or per-clip held-out output.
 - Confirm the GitHub repository link opens without authentication if a public link is required.
