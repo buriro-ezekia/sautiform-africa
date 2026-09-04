@@ -47,3 +47,11 @@ def test_validate_pcm_wav_rejects_too_short_recording(tmp_path: Path):
 
     with pytest.raises(DemoAudioError, match="too short"):
         validate_pcm_wav(path)
+
+
+def test_validate_pcm_wav_rejects_over_api_limit(tmp_path: Path):
+    path = tmp_path / "demo.wav"
+    _write_wav(path, duration_seconds=121.0)
+
+    with pytest.raises(DemoAudioError, match="120-second"):
+        validate_pcm_wav(path)

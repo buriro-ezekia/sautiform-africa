@@ -11,8 +11,36 @@ class DemoAudioError(RuntimeError):
     """Raised when microphone audio cannot be prepared safely for Sahara."""
 
 
+def _run_ffmpeg(command: list[str], failure_message: str) -> None:
+    completed = subprocess.run(
+        command,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if completed.returncode == 0:
+        return
+
+    detail = completed.stderr.strip()
+    if len(detail) > 500:
+        detail = detail[:500] + "..."
+    raise DemoAudioError(
+        failure_message + (f": {detail}" if detail else ".")
+    )
+
+
+def _ffmpeg_path() -> str:
+    ffmpeg = shutil.which("ffmpeg")
+    if ffmpeg is None:
+        raise DemoAudioError(
+            "FFmpeg is required to prepare microphone audio for Sahara. "
+            "Install FFmpeg or use the existing Whisper-ready environment."
+        )
+    return ffmpeg
+
+
 def validate_pcm_wav(path: Path) -> float:
-    """Validate the canonical demo WAV and return its duration in seconds."""
+    """Validate the canonical intermediate WAV and return its duration."""
     try:
         with wave.open(str(path), "rb") as handle:
             channels = handle.getnchannels()
@@ -20,17 +48,22 @@ def validate_pcm_wav(path: Path) -> float:
             sample_width = handle.getsampwidth()
             frames = handle.getnframes()
     except (wave.Error, OSError) as exc:
-        raise DemoAudioError("Prepared microphone audio is not a readable WAV file") from exc
+        raise DemoAudioError(
+            "Prepared microphone audio is not a readable WAV file"
+        ) from exc
 
     if channels != 1:
-        raise DemoAudioError(f"Prepared WAV must be mono; found {channels} channels")
+        raise DemoAudioError(
+            f"Prepared WAV must be mono; found {channels} channels"
+        )
     if sample_rate != 16_000:
         raise DemoAudioError(
             f"Prepared WAV must be 16000 Hz; found {sample_rate} Hz"
         )
     if sample_width != 2:
         raise DemoAudioError(
-            f"Prepared WAV must use 16-bit PCM; found {sample_width * 8}-bit samples"
+            "Prepared WAV must use 16-bit PCM; "
+            f"found {sample_width * 8}-bit samples"
         )
     if sample_rate <= 0:
         raise DemoAudioError("Prepared WAV has an invalid sample rate")
@@ -48,14 +81,8 @@ def validate_pcm_wav(path: Path) -> float:
 
 
 def normalise_microphone_wav(source: Path, target: Path) -> float:
-    """Convert browser WAV audio to canonical PCM WAV for the Sahara demo."""
-    ffmpeg = shutil.which("ffmpeg")
-    if ffmpeg is None:
-        raise DemoAudioError(
-            "FFmpeg is required to prepare microphone audio for Sahara. "
-            "Install FFmpeg or use the existing Whisper-ready environment."
-        )
-
+    """Convert browser WAV audio to canonical PCM WAV."""
+    ffmpeg = _ffmpeg_path()
     command = [
         ffmpeg,
         "-hide_banner",
@@ -73,22 +100,52 @@ def normalise_microphone_wav(source: Path, target: Path) -> float:
         "pcm_s16le",
         str(target),
     ]
-    completed = subprocess.run(
+    _run_ffmpeg(
         command,
-        capture_output=True,
-        text=True,
-        check=False,
+        "FFmpeg could not decode the microphone recording",
     )
-    if completed.returncode != 0:
-        detail = completed.stderr.strip()
-        if len(detail) > 500:
-            detail = detail[:500] + "..."
-        raise DemoAudioError(
-            "FFmpeg could not decode the microphone recording"
-            + (f": {detail}" if detail else ".")
-        )
 
     if not target.is_file() or target.stat().st_size <= 44:
         raise DemoAudioError("Prepared microphone WAV is empty")
 
     return validate_pcm_wav(target)
+
+
+def prepare_microphone_m4a(
+    source: Path,
+    pcm_target: Path,
+    m4a_target: Path,
+) -> float:
+    """Prepare browser microphone audio as Sahara-compatible M4A/AAC."""
+    duration = normalise_microphone_wav(source, pcm_target)
+    ffmpeg = _ffmpeg_path()
+    command = [
+        ffmpeg,
+        "-hide_banner",
+        "-loglevel",
+        "error",
+        "-y",
+        "-i",
+        str(pcm_target),
+        "-vn",
+        "-ac",
+        "1",
+        "-ar",
+        "16000",
+        "-c:a",
+        "aac",
+        "-b:a",
+        "64k",
+        "-movflags",
+        "+faststart",
+        str(m4a_target),
+    ]
+    _run_ffmpeg(
+        command,
+        "FFmpeg could not encode the Sahara M4A upload",
+    )
+
+    if not m4a_target.is_file() or m4a_target.stat().st_size <= 512:
+        raise DemoAudioError("Prepared Sahara M4A upload is empty")
+
+    return duration

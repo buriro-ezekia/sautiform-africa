@@ -12,8 +12,8 @@ a different limit, trim the narration rather than speeding through the live prod
 
 1. Pull the final submission branch and run the local quality gate.
 2. Start a fresh terminal and set `SAHARA_API_KEY` without displaying it.
-3. Confirm `ffmpeg -version` works in the same terminal; the demo normalises browser microphone
-audio to a canonical 16 kHz mono PCM WAV before Sahara upload.
+3. Confirm `ffmpeg -version` works in the same terminal; the demo decodes browser microphone audio
+to canonical 16 kHz mono PCM and uploads it as AAC/M4A, a format already proven through the Sahara API.
 4. Run `streamlit run app.py`.
 5. Confirm the page states **Intron Sahara v2.5 · Swahili–English**.
 6. Close terminals or windows that expose local paths, secrets or private benchmark data.

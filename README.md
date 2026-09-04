@@ -93,8 +93,9 @@ streamlit run app.py
 The competition product path is fixed to **Intron Sahara v2.5** for live Swahili-English speech.
 Whisper, MMS and Omnilingual remain benchmark comparators rather than selectable demo backends. A
 developer transcript fallback is retained only for testing the downstream form workflow without an
-API call. Browser microphone audio is normalised with FFmpeg to a canonical 16 kHz mono PCM WAV
-before upload so the live demo does not depend on browser-specific WAV encoding.
+API call. Browser microphone audio is decoded to canonical 16 kHz mono PCM and then encoded as AAC/M4A
+before upload. Intron documents M4A as a supported format, and this matches the file container already
+proven successfully through the participant Sahara API.
 
 ## Speech backends
 
